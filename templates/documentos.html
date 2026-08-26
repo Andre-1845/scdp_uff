@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Documentos{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <p class="trilha">{{ titulo_situacao }}</p>
+  <h1>Documentos prontos para baixar</h1>
+  <p class="subtitulo">Os documentos foram preenchidos com o que você informou. Baixe em Word, confira, assine e anexe conforme o fluxo.</p>
+
+  <div class="opcoes">
+    {% for rotulo, arquivo, tipo in lista %}
+    <a class="opcao-doc" href="{{ url_for('baixar_documento', sid=s.id, tipo=tipo) }}">
+      <span class="opcao-doc-nome">{{ rotulo }}</span>
+      <span class="opcao-doc-baixar">Baixar Word ↓</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if anexos %}
+  <h2 class="subtitulo" style="margin-top:1.6rem">Anexos enviados</h2>
+  <div class="opcoes">
+    {% for label, nome_campo in anexos %}
+    <a class="opcao-doc" href="{{ url_for('baixar_anexo', sid=s.id, nome_campo=nome_campo) }}">
+      <span class="opcao-doc-nome">{{ label }}</span>
+      <span class="opcao-doc-baixar">Baixar ↓</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="acoes">
+    <a class="botao botao-secundario" href="{{ url_for('minhas_solicitacoes') }}">Minhas solicitações</a>
+    <a class="botao" href="{{ url_for('escolher') }}">Nova solicitação</a>
+  </div>
+</div>
+{% endblock %}

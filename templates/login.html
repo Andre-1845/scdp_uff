@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block conteudo %}
+<div class="cartao cartao-centro">
+  <h1>Solicitação de afastamento</h1>
+  <p class="subtitulo">Acesse com sua conta institucional para preencher a solicitação de diárias, passagens e afastamentos em um só lugar.</p>
+
+  {% if oauth_ativo %}
+  <a class="botao botao-google" href="{{ url_for('auth_google') }}">Entrar com Google</a>
+  <p class="nota">Somente contas @{{ dominio }}. Sua senha é digitada no próprio Google, este site nunca a recebe.</p>
+  {% else %}
+  <p class="nota">O login com Google ainda não foi configurado neste ambiente. Veja o arquivo README para ativar.</p>
+  {% endif %}
+
+  {% if dev_login %}
+  <div class="separador"><span>ou entre para testar</span></div>
+  <form method="post" action="{{ url_for('dev_login') }}" class="form">
+    <label>Nome
+      <input type="text" name="nome" placeholder="Seu nome">
+    </label>
+    <label>E-mail institucional
+      <input type="email" name="email" placeholder="voce@{{ dominio }}" required>
+    </label>
+    <button class="botao" type="submit">Acessar para teste</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

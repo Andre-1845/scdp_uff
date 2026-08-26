@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Qual é a minha situação{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  {% if not resultado %}
+  <h1>Descubra a sua situação</h1>
+  <p class="subtitulo">Responda quatro perguntas e o sistema indica o fluxo correto conforme a IN 058/2023.</p>
+  <form method="post" class="form">
+    <label>A viagem é
+      <select name="abrangencia" required>
+        <option value="nacional">No Brasil</option>
+        <option value="exterior">Ao exterior</option>
+      </select>
+    </label>
+    <label>Tipo de atividade
+      <select name="atividade" required>
+        <option value="servico">Viagem a serviço</option>
+        <option value="congresso">Congresso, evento ou seminário</option>
+        <option value="treinamento">Treinamento</option>
+        <option value="capacitacao">Capacitação ou curso</option>
+        <option value="banca">Banca de concurso</option>
+        <option value="campo">Trabalho de campo</option>
+      </select>
+    </label>
+    <label>Duração
+      <select name="periodo" required>
+        <option value="ate15">De 1 a 15 dias</option>
+        <option value="mais15">Mais de 15 dias</option>
+      </select>
+    </label>
+    <label>Categoria do servidor
+      <select name="categoria" required>
+        <option value="docente">Docente</option>
+        <option value="tecnico">Técnico-administrativo</option>
+      </select>
+    </label>
+    <div class="acoes">
+      <a class="botao botao-secundario" href="{{ url_for('escolher') }}">Voltar</a>
+      <button class="botao" type="submit">Ver minha situação</button>
+    </div>
+  </form>
+  {% else %}
+  <p class="trilha">Resultado do enquadramento</p>
+  <h1>{{ titulo }}</h1>
+  <div class="orientacao">{{ explicacao }}</div>
+  <p class="subtitulo">Abre processo no SEI? <strong>{{ "Sim" if abre_sei else "Não" }}</strong></p>
+  <div class="acoes">
+    <a class="botao botao-secundario" href="{{ url_for('enquadrar') }}">Refazer</a>
+    <a class="botao" href="{{ url_for('solicitar', situacao=situacao, passo=1) }}">Iniciar esta solicitação</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

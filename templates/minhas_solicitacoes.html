@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Minhas solicitações{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-secao">
+  <h1>Minhas solicitações</h1>
+  <a class="botao" href="{{ url_for('escolher') }}">Nova solicitação</a>
+</div>
+
+{% if not itens %}
+  <div class="vazio">Você ainda não registrou nenhuma solicitação. Comece uma agora.</div>
+{% else %}
+  <table class="tabela">
+    <thead>
+      <tr><th>Data</th><th>Situação</th><th>Destino</th><th>Início</th><th>Documentos</th></tr>
+    </thead>
+    <tbody>
+      {% for s in itens %}
+      <tr>
+        <td>{{ s.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td>{{ cfg[s.situacao].titulo if s.situacao in cfg else s.situacao }}</td>
+        <td>{{ s.respostas.get('destino') or s.respostas.get('cidade_destino') or '—' }}</td>
+        <td>{{ s.respostas.get('data_inicio')|data_br or '—' }}</td>
+        <td><a class="link" href="{{ url_for('documentos', sid=s.id) }}">Baixar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

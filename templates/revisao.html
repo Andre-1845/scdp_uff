@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Revisão{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <p class="trilha">{{ titulo_situacao }}</p>
+  <h1>Revise antes de enviar</h1>
+  <p class="subtitulo">Confira os dados. Se algo estiver errado, volte ao formulário correspondente.</p>
+
+  {% for f in forms %}
+  <section class="bloco-revisao">
+    <div class="bloco-topo">
+      <h2>{{ f.titulo }}</h2>
+      <a class="link" href="{{ url_for('solicitar', situacao=situacao, passo=loop.index) }}">Editar</a>
+    </div>
+    <dl class="lista-dados">
+      {% for campo in f.campos %}
+      <div class="linha-dado">
+        <dt>{{ campo.label }}</dt>
+        {% if campo.tipo == 'file' %}
+          <dd>{% if respostas.get(campo.nome) %}📎 {{ respostas.get(campo.nome)|nome_arquivo }}{% else %}Nenhum arquivo anexado{% endif %}</dd>
+        {% else %}
+          <dd>{{ respostas.get(campo.nome) or '—' }}</dd>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </dl>
+  </section>
+  {% endfor %}
+
+  <form method="post" action="{{ url_for('salvar', situacao=situacao) }}" class="acoes">
+    <a class="botao botao-secundario" href="{{ url_for('escolher') }}">Cancelar</a>
+    <button class="botao" type="submit">Enviar solicitação</button>
+  </form>
+</div>
+{% endblock %}

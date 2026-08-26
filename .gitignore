@@ -1,0 +1,12 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+.env
+
+# banco local e uploads dos professores - nunca devem ir pro git
+dados.db
+uploads/
+
+.DS_Store

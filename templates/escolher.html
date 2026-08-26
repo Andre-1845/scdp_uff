@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Nova solicitação{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-secao">
+  <h1>Escolha a situação do afastamento</h1>
+  <p class="subtitulo">Cada situação segue um caminho e um conjunto de formulários diferente, conforme a IN 058/2023.</p>
+</div>
+
+<a class="enquadrar-chamada" href="{{ url_for('enquadrar') }}">
+  <strong>Não sabe qual escolher?</strong> Responda quatro perguntas e o sistema indica a situação correta. →
+</a>
+
+<div class="opcoes">
+  {% for chave, s in situacoes %}
+  <a class="opcao" href="{{ url_for('solicitar', situacao=chave, passo=1) }}">
+    <span class="opcao-num">{{ s.ordem }}</span>
+    <span class="opcao-titulo">{{ s.titulo }}</span>
+    <span class="opcao-resumo">{{ s.resumo }}</span>
+    <span class="opcao-passos">{{ s.formularios|length }} formulário(s)</span>
+  </a>
+  {% endfor %}
+</div>
+
+<p class="nota aviso-regra">Regra de ouro, envie a documentação com no mínimo 15 dias de antecedência da viagem.</p>
+{% endblock %}

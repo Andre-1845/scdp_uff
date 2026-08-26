@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}{{ formulario.titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <div class="passos">
+    {% for i in range(1, total + 1) %}
+      <span class="passo {% if i == passo %}passo-atual{% elif i < passo %}passo-feito{% endif %}">{{ i }}</span>
+      {% if not loop.last %}<span class="passo-linha"></span>{% endif %}
+    {% endfor %}
+  </div>
+
+  <p class="trilha">{{ titulo_situacao }} · formulário {{ passo }} de {{ total }}</p>
+  <h1>{{ formulario.titulo }}</h1>
+  {% if formulario.descricao %}<p class="subtitulo">{{ formulario.descricao }}</p>{% endif %}
+  {% if formulario.orientacao %}<div class="orientacao">{{ formulario.orientacao }}</div>{% endif %}
+  {% if formulario.links %}
+    <div class="links-passo">
+      {% for l in formulario.links %}
+        <a class="link-externo" href="{{ l.url }}" target="_blank" rel="noopener">{{ l.label }} ↗</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="form" enctype="multipart/form-data">
+    {% for campo in formulario.campos %}
+      <label class="{% if campo.tipo == 'checkbox' %}campo-check{% endif %}">
+        {% if campo.tipo == 'select' %}
+          <span class="rotulo">{{ campo.label }}{% if campo.obrigatorio %} <em>*</em>{% endif %}</span>
+          <select name="{{ campo.nome }}" {% if campo.obrigatorio %}required{% endif %}>
+            <option value="">Selecione</option>
+            {% for op in campo.opcoes %}
+              <option value="{{ op }}" {% if valores[campo.nome] == op %}selected{% endif %}>{{ op }}</option>
+            {% endfor %}
+          </select>
+        {% elif campo.tipo == 'textarea' %}
+          <span class="rotulo">{{ campo.label }}{% if campo.obrigatorio %} <em>*</em>{% endif %}</span>
+          <textarea name="{{ campo.nome }}" rows="3" {% if campo.obrigatorio %}required{% endif %}>{{ valores[campo.nome] }}</textarea>
+        {% elif campo.tipo == 'checkbox' %}
+          <input type="checkbox" name="{{ campo.nome }}" value="1" {% if valores[campo.nome] == 'Sim' %}checked{% endif %} {% if campo.obrigatorio %}required{% endif %}>
+          <span class="rotulo">{{ campo.label }}{% if campo.obrigatorio %} <em>*</em>{% endif %}</span>
+        {% elif campo.tipo == 'file' %}
+          <span class="rotulo">{{ campo.label }}</span>
+          <input type="file" name="{{ campo.nome }}" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+          {% if valores[campo.nome] %}<small class="ajuda">Já anexado: {{ valores[campo.nome]|nome_arquivo }}. Escolha outro arquivo apenas se quiser substituí-lo.</small>{% endif %}
+        {% else %}
+          <span class="rotulo">{{ campo.label }}{% if campo.obrigatorio %} <em>*</em>{% endif %}</span>
+          <input type="{{ campo.tipo }}" name="{{ campo.nome }}" value="{{ valores[campo.nome] }}" {% if campo.obrigatorio %}required{% endif %}>
+        {% endif %}
+        {% if campo.ajuda %}<small class="ajuda">{{ campo.ajuda }}</small>{% endif %}
+      </label>
+    {% endfor %}
+
+    <div class="acoes">
+      {% if passo > 1 %}
+        <a class="botao botao-secundario" href="{{ url_for('solicitar', situacao=situacao, passo=passo-1) }}">Voltar</a>
+      {% else %}
+        <a class="botao botao-secundario" href="{{ url_for('escolher') }}">Cancelar</a>
+      {% endif %}
+      <button class="botao" type="submit">{% if passo < total %}Avançar{% else %}Revisar{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

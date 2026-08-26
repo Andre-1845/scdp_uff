@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Meus dados{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <h1>Meus dados</h1>
+  <p class="subtitulo">Estes dados ficam salvos e são reaproveitados nas próximas solicitações.</p>
+  <form method="post" class="form">
+    <label>Nome completo
+      <input type="text" name="nome" value="{{ doc.nome or '' }}" required>
+    </label>
+    <div class="linha">
+      <label>SIAPE
+        <input type="text" name="siape" value="{{ doc.siape or '' }}">
+      </label>
+      <label>Telefone
+        <input type="text" name="telefone" value="{{ doc.telefone or '' }}">
+      </label>
+    </div>
+    <div class="linha">
+      <label>Departamento
+        <input type="text" name="departamento" value="{{ doc.departamento or '' }}">
+      </label>
+      <label>Cargo
+        <input type="text" name="cargo" value="{{ doc.cargo or '' }}">
+      </label>
+    </div>
+    <label>E-mail institucional
+      <input type="email" value="{{ doc.email }}" disabled>
+    </label>
+    <button class="botao" type="submit">Salvar e continuar</button>
+  </form>
+</div>
+{% endblock %}

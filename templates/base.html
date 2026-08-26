@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Afastamentos{% endblock %} · Secretaria VEI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-inner">
+      <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-forte">Afastamentos</span>
+        <span class="marca-sub">Secretaria VEI</span>
+      </a>
+      {% if usuario %}
+      <nav class="nav">
+        <a href="{{ url_for('escolher') }}">Nova solicitação</a>
+        <a href="{{ url_for('minhas_solicitacoes') }}">Minhas solicitações</a>
+        <a href="{{ url_for('perfil') }}">Meus dados</a>
+        <span class="nav-usuario">{{ usuario.email }}</span>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="conteudo">
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% if mensagens %}
+        <div class="avisos">
+          {% for categoria, msg in mensagens %}
+            <div class="aviso aviso-{{ categoria }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer class="rodape">
+    Protótipo acadêmico. Concentra a solicitação antes do lançamento no SCDP, não substitui o SCDP.
+  </footer>
+</body>
+</html>
