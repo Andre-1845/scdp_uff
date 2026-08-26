@@ -35,7 +35,15 @@ Ao concluir uma solicitação, o sistema abre a tela de documentos e monta arqui
 
 A geração usa a biblioteca python-docx, já incluída no requirements.txt.
 
-## Como rodar
+## Como rodar (sem usar terminal, para quem não programa)
+
+Para uma pessoa que nunca usou Python, existe um guia ilustrado passo a
+passo: `GUIA_INSTALACAO_SCDP.docx`. Ele explica como instalar o Python e
+como criar um atalho na Área de Trabalho (`iniciar_sistema.bat` +
+`criar_atalho.ps1`) que abre o sistema com um duplo clique, sem precisar
+de terminal, VSCode ou qualquer ferramenta de programação.
+
+## Como rodar (linha de comando, para quem já programa)
 
 1. Crie e ative um ambiente virtual.
    - `python -m venv venv`
@@ -220,5 +228,8 @@ A plataforma lida com dados de servidores, então precisa de conformidade com a 
 - static/style.css, o estilo
 - requirements.txt, as dependências
 - .env.example, o modelo de configuração
+- GUIA_INSTALACAO_SCDP.docx, o guia passo a passo para quem nunca usou Python
+- iniciar_sistema.bat / criar_atalho.ps1, o atalho de abrir o sistema com
+  duplo clique (veja o guia acima)
 - uploads/, os arquivos anexados pelos professores (criada sozinha no
   primeiro uso; não é versionada no git)
