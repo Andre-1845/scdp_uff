@@ -27,7 +27,9 @@
   </section>
   {% endfor %}
 
-  <form method="post" action="{{ url_for('salvar', situacao=situacao) }}" class="acoes">
+  <form method="post" action="{{ url_for('salvar', situacao=situacao) }}" class="acoes"
+        onsubmit="return confirm('Confirma o envio? Isso registra a solicitação e gera os documentos oficiais preenchidos com os dados acima.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <a class="botao botao-secundario" href="{{ url_for('escolher') }}">Cancelar</a>
     <button class="botao" type="submit">Enviar solicitação</button>
   </form>

@@ -6,6 +6,25 @@
   <p class="subtitulo">Cada situação segue um caminho e um conjunto de formulários diferente, conforme a IN 058/2023.</p>
 </div>
 
+{% if rascunhos_pendentes %}
+<div class="rascunhos-pendentes">
+  <strong>Você tem solicitação(ões) em andamento:</strong>
+  <ul>
+    {% for r in rascunhos_pendentes %}
+    <li>
+      <a href="{{ url_for('solicitar', situacao=r.situacao, passo=1) }}">{{ r.titulo }}</a>
+      <span class="ajuda">— alterado em {{ r.atualizado_em.strftime('%d/%m/%Y %H:%M') }}</span>
+      <form method="post" action="{{ url_for('descartar_rascunho', situacao=r.situacao) }}"
+            class="form-descartar" onsubmit="return confirm('Descartar este rascunho? Não dá para desfazer.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="link link-descartar">descartar</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
 <a class="enquadrar-chamada" href="{{ url_for('enquadrar') }}">
   <strong>Não sabe qual escolher?</strong> Responda quatro perguntas e o sistema indica a situação correta. →
 </a>
@@ -16,10 +35,10 @@
     <span class="opcao-num">{{ s.ordem }}</span>
     <span class="opcao-titulo">{{ s.titulo }}</span>
     <span class="opcao-resumo">{{ s.resumo }}</span>
-    <span class="opcao-passos">{{ s.formularios|length }} formulário(s)</span>
+    <span class="opcao-passos">{{ s.formularios|length }} formulário(s) · envie com no mínimo {{ s.prazo_dias or 15 }} dias de antecedência</span>
   </a>
   {% endfor %}
 </div>
 
-<p class="nota aviso-regra">Regra de ouro, envie a documentação com no mínimo 15 dias de antecedência da viagem.</p>
+<p class="nota aviso-regra">Regra de ouro: o prazo mínimo de antecedência varia por situação (veja abaixo de cada uma). Quanto antes enviar, melhor.</p>
 {% endblock %}

@@ -137,14 +137,84 @@ o acesso no próximo login dela.
 - Acesso aos documentos Word e aos anexos de qualquer solicitação (a
   Secretaria não fica restrita a ver só o que ela mesma preencheu).
 
+## Correções e melhorias (segunda rodada)
+
+**Atenção, antes de rodar esta versão:** ela acrescenta mais uma tabela no
+banco (`rascunho`). Se você já vinha usando uma versão anterior e o
+`dados.db` já existe, apague-o antes de rodar de novo, pelo mesmo motivo já
+explicado na seção do Painel da Secretaria — o SQLite não cria coluna ou
+tabela nova sozinho num banco que já existe. Isso é só para a fase de
+protótipo, sem dado real em uso.
+
+### Rascunho do formulário agora sobrevive a fechar o navegador
+
+Antes, as respostas dos passos do formulário ficavam só num cookie de
+sessão do navegador — se o professor fechasse a aba ou o navegador no meio
+do preenchimento, perdia tudo sem aviso. Agora cada resposta é salva no
+banco de dados a cada passo, associada ao professor e à situação. Se ele
+sair no meio do caminho, ao voltar (mesmo em outro dia, outro computador
+com o mesmo login) a tela "Nova solicitação" mostra um aviso "Você tem
+solicitação(ões) em andamento", com um link para continuar de onde parou e
+outro para descartar o rascunho.
+
+### Documento oficial não sai mais incompleto por falta de dado do SIAPE
+
+O Anexo II depende de SIAPE, departamento e cargo do professor, que vêm da
+tela "Meus dados". Antes, esses campos eram opcionais e dava para gerar um
+documento oficial com eles em branco. Agora:
+- No primeiro login, só é forçada a tela de perfil se algum desses dados
+  estiver faltando (antes era sempre forçada, mesmo sem nada a corrigir).
+- Antes de enviar a solicitação (na revisão e na gravação), o sistema
+  confere de novo se o perfil está completo; se não estiver, manda para a
+  tela "Meus dados" com aviso de quais campos faltam.
+
+### Prazo de antecedência agora é o correto por situação
+
+O aviso e a validação de "regra de ouro" usavam sempre 15 dias, mas a
+norma pede 60 dias de antecedência para as situações "nacional longo" e
+"internacional" (isso já estava certo no resumo de cada card, mas a
+validação do formulário e o aviso fixo no rodapé da tela "Nova solicitação"
+ainda usavam 15 para todas). Agora o prazo vem do `forms_config.json` (uma
+entrada `prazo_dias` por situação) e cada card mostra o prazo certo.
+
+### Segurança, antes de sair do protótipo
+
+- **Proteção CSRF** em todos os formulários (Flask-WTF), o que evita que
+  outro site force uma ação no sistema em nome de um usuário já logado.
+- **`debug` desligado por padrão**: antes ficava sempre ligado
+  (`debug=True`), o que expõe informação interna e o debugger interativo
+  do Werkzeug em caso de erro. Agora só liga se `FLASK_DEBUG=1` estiver no
+  `.env`, e o padrão de fábrica é desligado.
+- A lógica do assistente de enquadramento (`_enquadrar()`) agora lê os
+  limites e listas (quais atividades contam como "desenvolvimento", o
+  limite de dias, quais categorias sempre abrem SEI) de uma seção nova do
+  `forms_config.json` (`enquadramento`), em vez de ter esses números fixos
+  no código Python. Ainda não é um "motor de regras" completo — a
+  estrutura da lógica continua em Python — mas os números que mais mudam
+  com a norma agora ficam editáveis sem mexer em código.
+- Segue pendente (recomendação, não implementado ainda): trocar o SQLite
+  por um banco com melhor suporte a acesso concorrente antes de qualquer
+  uso com volume real de professores simultâneos.
+
+### Outras melhorias de uso do dia a dia
+
+- Confirmação antes de enviar a solicitação final ("Confirma o envio?
+  Isso registra a solicitação e gera os documentos oficiais..."), já que
+  antes o clique único no botão já gravava tudo.
+- Dá para excluir uma solicitação enviada por engano, enquanto ela ainda
+  estiver com status "Pendente" (tela "Minhas solicitações"). Depois que a
+  Secretaria começa a tratar (muda o status), não dá mais para excluir por
+  ali — nesse caso é preciso falar direto com a Secretaria.
+
 ## Cuidados para virar oficial
 
-A plataforma lida com dados de servidores, então precisa de conformidade com a LGPD e do aval da área de tecnologia da UFF, a STI, antes de entrar em produção. Este protótipo serve para validar a ideia e demonstrar o conceito.
+A plataforma lida com dados de servidores, então precisa de conformidade com a LGPD e do aval da área de tecnologia da UFF, a STI, antes de entrar em produção. Este protótipo serve para validar a ideia e demonstrar o conceito. Como avanço desde a versão anterior, já tem proteção CSRF nos formulários e o modo debug fica desligado por padrão — mas o SQLite (bom para protótipo) ainda precisa ser avaliado antes de um uso com volume real.
 
 ## Estrutura dos arquivos
 
 - app.py, a aplicação e as rotas
-- forms_config.json, a definição dos formulários
+- forms_config.json, a definição dos formulários (inclui o prazo de
+  antecedência e as regras do assistente de enquadramento)
 - docs_gen.py, a geração dos documentos Word
 - templates, as telas em HTML
 - static/style.css, o estilo

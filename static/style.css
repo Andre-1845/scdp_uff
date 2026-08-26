@@ -135,3 +135,12 @@ input:disabled{background:#f0f1f4;color:#7b8393}
 .status-lançado-no-scdp{background:var(--azul-claro);color:var(--azul);border-color:#b9d3e8}
 .status-concluído{background:var(--ok-bg);color:var(--ok-tx);border-color:#bfe3cb}
 .form-status{margin:0}
+
+
+/* rascunhos pendentes na tela "Nova solicitação" (retomar de onde parou) */
+.rascunhos-pendentes{background:#fff7e6;border:1px solid #f0d9a8;color:#7a5a12;padding:.8rem 1rem;border-radius:10px;margin-bottom:1rem;font-size:.9rem}
+.rascunhos-pendentes ul{margin:.5rem 0 0;padding-left:1.1rem}
+.rascunhos-pendentes li{margin:.25rem 0;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.form-descartar{display:inline;margin:0}
+.link-descartar{background:none;border:none;padding:0;font:inherit;color:#a33;cursor:pointer;text-decoration:underline;font-size:.82rem}
+.link-descartar:hover{color:#7a2222}

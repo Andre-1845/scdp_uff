@@ -1,11 +1,33 @@
 {
   "links_uteis": [
-    {"label": "SCDP - sistema federal", "url": "https://www2.scdp.gov.br/novoscdp/home.xhtml"},
-    {"label": "Página SCDP da UFF (formulários e orientações)", "url": "https://www.uff.br/?q=scdp"},
-    {"label": "Painel de Viagens do governo", "url": "http://paineldeviagens.economia.gov.br/"}
+    {
+      "label": "SCDP - sistema federal",
+      "url": "https://www2.scdp.gov.br/novoscdp/home.xhtml"
+    },
+    {
+      "label": "Página SCDP da UFF (formulários e orientações)",
+      "url": "https://www.uff.br/?q=scdp"
+    },
+    {
+      "label": "Painel de Viagens do governo",
+      "url": "http://paineldeviagens.economia.gov.br/"
+    }
   ],
-  "motivos_nacionais": ["NACIONAL - A serviço", "NACIONAL - Congresso", "NACIONAL - Encontro/Seminário", "NACIONAL - Treinamento", "NACIONAL - Banca examinadora", "NACIONAL - Trabalho de campo", "NACIONAL - Capacitação/curso"],
-  "motivos_internacionais": ["INTERNACIONAL - Evento científico", "INTERNACIONAL - Congresso", "INTERNACIONAL - Capacitação/curso", "INTERNACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)"],
+  "motivos_nacionais": [
+    "NACIONAL - A serviço",
+    "NACIONAL - Congresso",
+    "NACIONAL - Encontro/Seminário",
+    "NACIONAL - Treinamento",
+    "NACIONAL - Banca examinadora",
+    "NACIONAL - Trabalho de campo",
+    "NACIONAL - Capacitação/curso"
+  ],
+  "motivos_internacionais": [
+    "INTERNACIONAL - Evento científico",
+    "INTERNACIONAL - Congresso",
+    "INTERNACIONAL - Capacitação/curso",
+    "INTERNACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)"
+  ],
   "situacoes": {
     "nacional_curto": {
       "titulo": "Afastamento nacional curto (1 a 15 dias)",
@@ -18,12 +40,52 @@
           "descricao": "Confirme o enquadramento da viagem e informe destino e período.",
           "orientacao": "Base legal: IN GAR/RET/UFF 058/2023, Art. 6 e Anexo VII. Para docente em viagem nacional de 1 a 15 dias não se abre processo no SEI, apenas o formulário Anexo II.",
           "campos": [
-            {"nome": "motivo", "label": "Motivo da viagem", "tipo": "select", "obrigatorio": true, "opcoes": ["NACIONAL - A serviço", "NACIONAL - Congresso", "NACIONAL - Encontro/Seminário", "NACIONAL - Treinamento", "NACIONAL - Banca examinadora", "NACIONAL - Trabalho de campo", "NACIONAL - Capacitação/curso"]},
-            {"nome": "destino", "label": "Cidade de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "uf_destino", "label": "UF de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "data_inicio", "label": "Data de início da missão", "tipo": "date", "obrigatorio": true, "ajuda": "Prazo limite de entrega: 30 dias antes do início. Emissão de passagem exige no mínimo 15 dias de antecedência."},
-            {"nome": "data_fim", "label": "Data de término da missão", "tipo": "date", "obrigatorio": true},
-            {"nome": "confirma_enquadramento", "label": "Confirmo que é viagem no Brasil, de 1 a 15 dias, sem abertura de processo no SEI", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "motivo",
+              "label": "Motivo da viagem",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "NACIONAL - A serviço",
+                "NACIONAL - Congresso",
+                "NACIONAL - Encontro/Seminário",
+                "NACIONAL - Treinamento",
+                "NACIONAL - Banca examinadora",
+                "NACIONAL - Trabalho de campo",
+                "NACIONAL - Capacitação/curso"
+              ]
+            },
+            {
+              "nome": "destino",
+              "label": "Cidade de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "uf_destino",
+              "label": "UF de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "data_inicio",
+              "label": "Data de início da missão",
+              "tipo": "date",
+              "obrigatorio": true,
+              "ajuda": "Prazo limite de entrega: 30 dias antes do início. Emissão de passagem exige no mínimo 15 dias de antecedência."
+            },
+            {
+              "nome": "data_fim",
+              "label": "Data de término da missão",
+              "tipo": "date",
+              "obrigatorio": true
+            },
+            {
+              "nome": "confirma_enquadramento",
+              "label": "Confirmo que é viagem no Brasil, de 1 a 15 dias, sem abertura de processo no SEI",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -32,15 +94,84 @@
           "descricao": "Seção 5 do Anexo II. Informe passagens, diárias e os trechos de ida e volta.",
           "orientacao": "Seus dados pessoais e bancários não são pedidos aqui, pois vêm do SIAPE, conforme a Obs 1 do Anexo II. Preencha apenas os dados da viagem.",
           "campos": [
-            {"nome": "precisa_passagem", "label": "Precisa de passagem?", "tipo": "select", "obrigatorio": true, "opcoes": ["Sim", "Não"]},
-            {"nome": "modo_passagem", "label": "Modo da passagem", "tipo": "select", "obrigatorio": false, "opcoes": ["Aérea", "Rodoviária", "Fluvial"]},
-            {"nome": "precisa_diaria", "label": "Precisa de diárias?", "tipo": "select", "obrigatorio": true, "opcoes": ["Sim", "Não"]},
-            {"nome": "adicional_deslocamento", "label": "Adicional de deslocamento?", "tipo": "select", "obrigatorio": false, "opcoes": ["Sim", "Não"]},
-            {"nome": "bagagem_despachada", "label": "Bagagem despachada? (a partir de 3 pernoites)", "tipo": "select", "obrigatorio": false, "opcoes": ["Sim", "Não"]},
-            {"nome": "trecho_ida", "label": "Trecho de ida (origem, data, destino, meio)", "tipo": "text", "obrigatorio": true, "ajuda": "Ex.: Volta Redonda-RJ, 18/08, Rio de Janeiro-RJ, Rodoviário."},
-            {"nome": "trecho_volta", "label": "Trecho de volta (origem, data, destino, meio)", "tipo": "text", "obrigatorio": true},
-            {"nome": "inicio_missao", "label": "Data e hora de início da missão", "tipo": "text", "obrigatorio": true, "ajuda": "Igual ao início do afastamento da sede de lotação. Ex.: 18/08/2025 08h."},
-            {"nome": "fim_missao", "label": "Data e hora do fim da missão", "tipo": "text", "obrigatorio": true, "ajuda": "Igual à chegada na sede de lotação. Ex.: 20/08/2025 18h."}
+            {
+              "nome": "precisa_passagem",
+              "label": "Precisa de passagem?",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "modo_passagem",
+              "label": "Modo da passagem",
+              "tipo": "select",
+              "obrigatorio": false,
+              "opcoes": [
+                "Aérea",
+                "Rodoviária",
+                "Fluvial"
+              ]
+            },
+            {
+              "nome": "precisa_diaria",
+              "label": "Precisa de diárias?",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "adicional_deslocamento",
+              "label": "Adicional de deslocamento?",
+              "tipo": "select",
+              "obrigatorio": false,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "bagagem_despachada",
+              "label": "Bagagem despachada? (a partir de 3 pernoites)",
+              "tipo": "select",
+              "obrigatorio": false,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "trecho_ida",
+              "label": "Trecho de ida (origem, data, destino, meio)",
+              "tipo": "text",
+              "obrigatorio": true,
+              "ajuda": "Ex.: Volta Redonda-RJ, 18/08, Rio de Janeiro-RJ, Rodoviário."
+            },
+            {
+              "nome": "trecho_volta",
+              "label": "Trecho de volta (origem, data, destino, meio)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "inicio_missao",
+              "label": "Data e hora de início da missão",
+              "tipo": "text",
+              "obrigatorio": true,
+              "ajuda": "Igual ao início do afastamento da sede de lotação. Ex.: 18/08/2025 08h."
+            },
+            {
+              "nome": "fim_missao",
+              "label": "Data e hora do fim da missão",
+              "tipo": "text",
+              "obrigatorio": true,
+              "ajuda": "Igual à chegada na sede de lotação. Ex.: 20/08/2025 18h."
+            }
           ]
         },
         {
@@ -48,11 +179,38 @@
           "titulo": "Passo 3 - Objetivo e justificativas",
           "descricao": "Seções 6 e 7 do Anexo II. Descreva o motivo e justifique o que se aplicar.",
           "campos": [
-            {"nome": "descricao_motivo", "label": "Descrição do motivo da viagem, com vínculo às atividades da UFF", "tipo": "textarea", "obrigatorio": true, "ajuda": "Resuma o nome do evento e o local."},
-            {"nome": "justif_urgencia", "label": "Justificativa se viagem urgente (menos de 15 dias)", "tipo": "textarea", "obrigatorio": false, "ajuda": "Com passagem aérea urgente, inclua o Anexo VIII na PCDP."},
-            {"nome": "justif_fimsemana", "label": "Justificativa se envolver sexta, fim de semana ou feriado", "tipo": "textarea", "obrigatorio": false},
-            {"nome": "justif_horario", "label": "Justificativa se embarque/desembarque fora de 7h às 21h", "tipo": "textarea", "obrigatorio": false},
-            {"nome": "num_sei", "label": "Número do processo no SEI (se houver)", "tipo": "text", "obrigatorio": false}
+            {
+              "nome": "descricao_motivo",
+              "label": "Descrição do motivo da viagem, com vínculo às atividades da UFF",
+              "tipo": "textarea",
+              "obrigatorio": true,
+              "ajuda": "Resuma o nome do evento e o local."
+            },
+            {
+              "nome": "justif_urgencia",
+              "label": "Justificativa se viagem urgente (menos de 15 dias)",
+              "tipo": "textarea",
+              "obrigatorio": false,
+              "ajuda": "Com passagem aérea urgente, inclua o Anexo VIII na PCDP."
+            },
+            {
+              "nome": "justif_fimsemana",
+              "label": "Justificativa se envolver sexta, fim de semana ou feriado",
+              "tipo": "textarea",
+              "obrigatorio": false
+            },
+            {
+              "nome": "justif_horario",
+              "label": "Justificativa se embarque/desembarque fora de 7h às 21h",
+              "tipo": "textarea",
+              "obrigatorio": false
+            },
+            {
+              "nome": "num_sei",
+              "label": "Número do processo no SEI (se houver)",
+              "tipo": "text",
+              "obrigatorio": false
+            }
           ]
         },
         {
@@ -61,9 +219,31 @@
           "descricao": "Anexo V. Obrigatório quando o proposto vai sem diária e/ou sem passagem.",
           "orientacao": "Só preencha se você renuncia a diárias e/ou passagens. A renúncia deve ser justificada, evidenciando o interesse da Administração no deslocamento.",
           "campos": [
-            {"nome": "renuncia_aplica", "label": "Vou renunciar a diárias e/ou passagens", "tipo": "select", "obrigatorio": true, "opcoes": ["Não se aplica", "Renuncio a diárias", "Renuncio a passagens", "Renuncio a diárias e passagens"]},
-            {"nome": "renuncia_motivo", "label": "Motivo da renúncia e fonte de recurso", "tipo": "textarea", "obrigatorio": false, "ajuda": "Ex.: recursos próprios, FAPERJ, CAPES."},
-            {"nome": "renuncia_ciente", "label": "Li e concordo com o Termo de Renúncia (Anexo V), quando aplicável", "tipo": "checkbox", "obrigatorio": false}
+            {
+              "nome": "renuncia_aplica",
+              "label": "Vou renunciar a diárias e/ou passagens",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Não se aplica",
+                "Renuncio a diárias",
+                "Renuncio a passagens",
+                "Renuncio a diárias e passagens"
+              ]
+            },
+            {
+              "nome": "renuncia_motivo",
+              "label": "Motivo da renúncia e fonte de recurso",
+              "tipo": "textarea",
+              "obrigatorio": false,
+              "ajuda": "Ex.: recursos próprios, FAPERJ, CAPES."
+            },
+            {
+              "nome": "renuncia_ciente",
+              "label": "Li e concordo com o Termo de Renúncia (Anexo V), quando aplicável",
+              "tipo": "checkbox",
+              "obrigatorio": false
+            }
           ]
         },
         {
@@ -72,19 +252,56 @@
           "descricao": "Coleta de assinaturas, documentos comprobatórios e envio para cadastro da PCDP.",
           "orientacao": "O formulário só é válido com a assinatura do proposto e do chefe do departamento. Depois envie para vei@id.uff.br para o Solicitante de Viagem cadastrar a PCDP no SCDP.",
           "links": [
-            {"label": "Abrir o SCDP", "url": "https://www2.scdp.gov.br/novoscdp/home.xhtml"},
-            {"label": "Formulários e orientações da UFF", "url": "https://www.uff.br/?q=scdp"}
+            {
+              "label": "Abrir o SCDP",
+              "url": "https://www2.scdp.gov.br/novoscdp/home.xhtml"
+            },
+            {
+              "label": "Formulários e orientações da UFF",
+              "url": "https://www.uff.br/?q=scdp"
+            }
           ],
           "campos": [
-            {"nome": "chefe_departamento", "label": "Nome do Chefe de Departamento (proponente)", "tipo": "text", "obrigatorio": true},
-            {"nome": "assina_solicitante", "label": "Confirmo a assinatura do proposto", "tipo": "checkbox", "obrigatorio": true},
-            {"nome": "anexo_convite", "label": "Anexar convite ou carta aceite", "tipo": "file", "obrigatorio": false},
-            {"nome": "anexo_programacao", "label": "Anexar programação ou folder do evento", "tipo": "file", "obrigatorio": false},
-            {"nome": "anexo_form_assinado", "label": "Anexar Anexo II e Termo de Renúncia assinados", "tipo": "file", "obrigatorio": false},
-            {"nome": "confirma_envio", "label": "Confirmo o envio para vei@id.uff.br para cadastro da PCDP", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "chefe_departamento",
+              "label": "Nome do Chefe de Departamento (proponente)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "assina_solicitante",
+              "label": "Confirmo a assinatura do proposto",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            },
+            {
+              "nome": "anexo_convite",
+              "label": "Anexar convite ou carta aceite",
+              "tipo": "file",
+              "obrigatorio": false
+            },
+            {
+              "nome": "anexo_programacao",
+              "label": "Anexar programação ou folder do evento",
+              "tipo": "file",
+              "obrigatorio": false
+            },
+            {
+              "nome": "anexo_form_assinado",
+              "label": "Anexar Anexo II e Termo de Renúncia assinados",
+              "tipo": "file",
+              "obrigatorio": false
+            },
+            {
+              "nome": "confirma_envio",
+              "label": "Confirmo o envio para vei@id.uff.br para cadastro da PCDP",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         }
-      ]
+      ],
+      "prazo_dias": 15
     },
     "nacional_longo": {
       "titulo": "Afastamento nacional longo (mais de 15 dias)",
@@ -96,15 +313,65 @@
           "titulo": "Passo 1 - Abertura no SEI",
           "descricao": "Abra o processo no SEI seguindo a Base de Conhecimento e informe o número gerado.",
           "orientacao": "Base legal: IN 058/2023, Art. 9 e Anexo VII. Processos de afastamento acima de 15 dias vão à DACQ/CPD/PROGEPE via SEI, com antecedência mínima de 60 dias.",
-          "links": [{"label": "Orientações da UFF sobre SCDP e SEI", "url": "https://www.uff.br/?q=scdp"}],
+          "links": [
+            {
+              "label": "Orientações da UFF sobre SCDP e SEI",
+              "url": "https://www.uff.br/?q=scdp"
+            }
+          ],
           "campos": [
-            {"nome": "num_sei", "label": "Número do processo no SEI", "tipo": "text", "obrigatorio": true, "ajuda": "Ex.: 23069.XXXXXX/2025-XX."},
-            {"nome": "motivo", "label": "Motivo da viagem", "tipo": "select", "obrigatorio": true, "opcoes": ["NACIONAL - Treinamento", "NACIONAL - Congresso", "NACIONAL - Encontro/Seminário", "NACIONAL - Capacitação/curso", "NACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)", "NACIONAL - Trabalho de campo"]},
-            {"nome": "destino", "label": "Cidade de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "uf_destino", "label": "UF de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "data_inicio", "label": "Data de início da missão", "tipo": "date", "obrigatorio": true, "ajuda": "Encaminhar com no mínimo 60 dias de antecedência."},
-            {"nome": "data_fim", "label": "Data de término da missão", "tipo": "date", "obrigatorio": true},
-            {"nome": "confirma_base", "label": "Segui as instruções da Base de Conhecimento do SEI", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "num_sei",
+              "label": "Número do processo no SEI",
+              "tipo": "text",
+              "obrigatorio": true,
+              "ajuda": "Ex.: 23069.XXXXXX/2025-XX."
+            },
+            {
+              "nome": "motivo",
+              "label": "Motivo da viagem",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "NACIONAL - Treinamento",
+                "NACIONAL - Congresso",
+                "NACIONAL - Encontro/Seminário",
+                "NACIONAL - Capacitação/curso",
+                "NACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)",
+                "NACIONAL - Trabalho de campo"
+              ]
+            },
+            {
+              "nome": "destino",
+              "label": "Cidade de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "uf_destino",
+              "label": "UF de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "data_inicio",
+              "label": "Data de início da missão",
+              "tipo": "date",
+              "obrigatorio": true,
+              "ajuda": "Encaminhar com no mínimo 60 dias de antecedência."
+            },
+            {
+              "nome": "data_fim",
+              "label": "Data de término da missão",
+              "tipo": "date",
+              "obrigatorio": true
+            },
+            {
+              "nome": "confirma_base",
+              "label": "Segui as instruções da Base de Conhecimento do SEI",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -112,12 +379,50 @@
           "titulo": "Passo 2 - Formulários e dados da viagem",
           "descricao": "Preencha os formulários de afastamento no SEI e os dados da viagem do Anexo II.",
           "campos": [
-            {"nome": "precisa_passagem", "label": "Precisa de passagem?", "tipo": "select", "obrigatorio": true, "opcoes": ["Sim", "Não"]},
-            {"nome": "precisa_diaria", "label": "Precisa de diárias?", "tipo": "select", "obrigatorio": true, "opcoes": ["Sim", "Não"]},
-            {"nome": "trecho_ida", "label": "Trecho de ida (origem, data, destino, meio)", "tipo": "text", "obrigatorio": true},
-            {"nome": "trecho_volta", "label": "Trecho de volta (origem, data, destino, meio)", "tipo": "text", "obrigatorio": true},
-            {"nome": "descricao_motivo", "label": "Descrição do motivo, com vínculo às atividades da UFF", "tipo": "textarea", "obrigatorio": true},
-            {"nome": "form_afastamento_sei", "label": "Preenchi os formulários de afastamento no SEI", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "precisa_passagem",
+              "label": "Precisa de passagem?",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "precisa_diaria",
+              "label": "Precisa de diárias?",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "trecho_ida",
+              "label": "Trecho de ida (origem, data, destino, meio)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "trecho_volta",
+              "label": "Trecho de volta (origem, data, destino, meio)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "descricao_motivo",
+              "label": "Descrição do motivo, com vínculo às atividades da UFF",
+              "tipo": "textarea",
+              "obrigatorio": true
+            },
+            {
+              "nome": "form_afastamento_sei",
+              "label": "Preenchi os formulários de afastamento no SEI",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -125,8 +430,24 @@
           "titulo": "Passo 3 - Termo de renúncia",
           "descricao": "Anexo V, preenchido no SEI quando o proposto vai sem diária e/ou passagem.",
           "campos": [
-            {"nome": "renuncia_aplica", "label": "Vou renunciar a diárias e/ou passagens", "tipo": "select", "obrigatorio": true, "opcoes": ["Não se aplica", "Renuncio a diárias", "Renuncio a passagens", "Renuncio a diárias e passagens"]},
-            {"nome": "renuncia_ciente", "label": "Li e concordo com o Termo de Renúncia, quando aplicável", "tipo": "checkbox", "obrigatorio": false}
+            {
+              "nome": "renuncia_aplica",
+              "label": "Vou renunciar a diárias e/ou passagens",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Não se aplica",
+                "Renuncio a diárias",
+                "Renuncio a passagens",
+                "Renuncio a diárias e passagens"
+              ]
+            },
+            {
+              "nome": "renuncia_ciente",
+              "label": "Li e concordo com o Termo de Renúncia, quando aplicável",
+              "tipo": "checkbox",
+              "obrigatorio": false
+            }
           ]
         },
         {
@@ -135,11 +456,36 @@
           "descricao": "Assine no SEI, servidor e chefe, anexe os comprovantes e encaminhe à DACQ da PROGEPE.",
           "orientacao": "Assinatura digital no SEI pelo servidor e pelo chefe. Anexe os comprovantes do evento e encaminhe o processo para o DACQ/CPD/PROGEPE.",
           "campos": [
-            {"nome": "chefe_departamento", "label": "Nome do Chefe de Departamento (proponente)", "tipo": "text", "obrigatorio": true},
-            {"nome": "assinado_servidor", "label": "Assinado no SEI pelo servidor", "tipo": "checkbox", "obrigatorio": true},
-            {"nome": "assinado_chefe", "label": "Assinado no SEI pelo chefe", "tipo": "checkbox", "obrigatorio": true},
-            {"nome": "anexo_comprovantes", "label": "Anexar comprovantes do evento", "tipo": "file", "obrigatorio": false},
-            {"nome": "encaminhado_dacq", "label": "Encaminhei o processo para o DACQ/PROGEPE", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "chefe_departamento",
+              "label": "Nome do Chefe de Departamento (proponente)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "assinado_servidor",
+              "label": "Assinado no SEI pelo servidor",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            },
+            {
+              "nome": "assinado_chefe",
+              "label": "Assinado no SEI pelo chefe",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            },
+            {
+              "nome": "anexo_comprovantes",
+              "label": "Anexar comprovantes do evento",
+              "tipo": "file",
+              "obrigatorio": false
+            },
+            {
+              "nome": "encaminhado_dacq",
+              "label": "Encaminhei o processo para o DACQ/PROGEPE",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -148,10 +494,16 @@
           "descricao": "A DACQ da PROGEPE analisa, publica no BS-UFF quando for o caso, e providencia o cadastro da PCDP.",
           "orientacao": "Após a análise da DACQ e a publicação no Boletim de Serviço da UFF, a PCDP é cadastrada no SCDP pela unidade de lotação.",
           "campos": [
-            {"nome": "ciente_efetivacao", "label": "Estou ciente de que a DACQ/PROGEPE fará a análise e o cadastro da PCDP", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "ciente_efetivacao",
+              "label": "Estou ciente de que a DACQ/PROGEPE fará a análise e o cadastro da PCDP",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         }
-      ]
+      ],
+      "prazo_dias": 60
     },
     "internacional": {
       "titulo": "Afastamento internacional (exterior)",
@@ -163,14 +515,57 @@
           "titulo": "Passo 1 - Processo no SEI",
           "descricao": "Abertura de processo no SEI, obrigatória para o exterior, com no mínimo 60 dias de antecedência.",
           "orientacao": "Base legal: IN 058/2023, Art. 6 inciso II e Art. 9. O afastamento do país é autorizado pelo Reitor e publicado no DOU antes da viagem.",
-          "links": [{"label": "Orientações da UFF sobre SCDP e SEI", "url": "https://www.uff.br/?q=scdp"}],
+          "links": [
+            {
+              "label": "Orientações da UFF sobre SCDP e SEI",
+              "url": "https://www.uff.br/?q=scdp"
+            }
+          ],
           "campos": [
-            {"nome": "num_sei", "label": "Número do processo no SEI", "tipo": "text", "obrigatorio": true, "ajuda": "Ex.: 23069.XXXXXX/2025-XX."},
-            {"nome": "motivo", "label": "Motivo da viagem", "tipo": "select", "obrigatorio": true, "opcoes": ["INTERNACIONAL - Evento científico", "INTERNACIONAL - Congresso", "INTERNACIONAL - Capacitação/curso", "INTERNACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)"]},
-            {"nome": "pais_destino", "label": "País de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "cidade_destino", "label": "Cidade de destino", "tipo": "text", "obrigatorio": true},
-            {"nome": "data_inicio", "label": "Data de início da missão", "tipo": "date", "obrigatorio": true, "ajuda": "Abrir o processo com no mínimo 60 dias de antecedência."},
-            {"nome": "data_fim", "label": "Data de término da missão", "tipo": "date", "obrigatorio": true}
+            {
+              "nome": "num_sei",
+              "label": "Número do processo no SEI",
+              "tipo": "text",
+              "obrigatorio": true,
+              "ajuda": "Ex.: 23069.XXXXXX/2025-XX."
+            },
+            {
+              "nome": "motivo",
+              "label": "Motivo da viagem",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "INTERNACIONAL - Evento científico",
+                "INTERNACIONAL - Congresso",
+                "INTERNACIONAL - Capacitação/curso",
+                "INTERNACIONAL - Pós-graduação (mestrado, doutorado, pós-doc)"
+              ]
+            },
+            {
+              "nome": "pais_destino",
+              "label": "País de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "cidade_destino",
+              "label": "Cidade de destino",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "data_inicio",
+              "label": "Data de início da missão",
+              "tipo": "date",
+              "obrigatorio": true,
+              "ajuda": "Abrir o processo com no mínimo 60 dias de antecedência."
+            },
+            {
+              "nome": "data_fim",
+              "label": "Data de término da missão",
+              "tipo": "date",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -179,13 +574,57 @@
           "descricao": "Dados da viagem e apólice de seguro viagem, item obrigatório para inclusão no SCDP.",
           "orientacao": "A apólice de seguro viagem internacional é obrigatória e o proposto deve providenciá-la antes do cadastro da PCDP.",
           "campos": [
-            {"nome": "com_onus", "label": "Tipo de ônus", "tipo": "select", "obrigatorio": true, "opcoes": ["Com ônus", "Com ônus limitado", "Sem ônus"]},
-            {"nome": "precisa_passagem", "label": "Precisa de passagem?", "tipo": "select", "obrigatorio": true, "opcoes": ["Sim", "Não"]},
-            {"nome": "descricao_motivo", "label": "Descrição do motivo, com vínculo às atividades da UFF", "tipo": "textarea", "obrigatorio": true},
-            {"nome": "seguradora", "label": "Seguradora", "tipo": "text", "obrigatorio": true},
-            {"nome": "apolice", "label": "Número da apólice de seguro viagem", "tipo": "text", "obrigatorio": true},
-            {"nome": "anexo_apolice", "label": "Anexar apólice de seguro viagem internacional", "tipo": "file", "obrigatorio": false},
-            {"nome": "confirma_seguro", "label": "Confirmo que a apólice de seguro viagem foi providenciada", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "com_onus",
+              "label": "Tipo de ônus",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Com ônus",
+                "Com ônus limitado",
+                "Sem ônus"
+              ]
+            },
+            {
+              "nome": "precisa_passagem",
+              "label": "Precisa de passagem?",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Sim",
+                "Não"
+              ]
+            },
+            {
+              "nome": "descricao_motivo",
+              "label": "Descrição do motivo, com vínculo às atividades da UFF",
+              "tipo": "textarea",
+              "obrigatorio": true
+            },
+            {
+              "nome": "seguradora",
+              "label": "Seguradora",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "apolice",
+              "label": "Número da apólice de seguro viagem",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "anexo_apolice",
+              "label": "Anexar apólice de seguro viagem internacional",
+              "tipo": "file",
+              "obrigatorio": false
+            },
+            {
+              "nome": "confirma_seguro",
+              "label": "Confirmo que a apólice de seguro viagem foi providenciada",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -193,8 +632,24 @@
           "titulo": "Passo 3 - Termo de renúncia",
           "descricao": "Anexo V, quando o proposto vai sem diária e/ou passagem.",
           "campos": [
-            {"nome": "renuncia_aplica", "label": "Vou renunciar a diárias e/ou passagens", "tipo": "select", "obrigatorio": true, "opcoes": ["Não se aplica", "Renuncio a diárias", "Renuncio a passagens", "Renuncio a diárias e passagens"]},
-            {"nome": "renuncia_ciente", "label": "Li e concordo com o Termo de Renúncia, quando aplicável", "tipo": "checkbox", "obrigatorio": false}
+            {
+              "nome": "renuncia_aplica",
+              "label": "Vou renunciar a diárias e/ou passagens",
+              "tipo": "select",
+              "obrigatorio": true,
+              "opcoes": [
+                "Não se aplica",
+                "Renuncio a diárias",
+                "Renuncio a passagens",
+                "Renuncio a diárias e passagens"
+              ]
+            },
+            {
+              "nome": "renuncia_ciente",
+              "label": "Li e concordo com o Termo de Renúncia, quando aplicável",
+              "tipo": "checkbox",
+              "obrigatorio": false
+            }
           ]
         },
         {
@@ -203,9 +658,24 @@
           "descricao": "Envio ao DACQ da PROGEPE para autorização do Reitor e publicação no Diário Oficial da União.",
           "orientacao": "A autorização de afastamento do país é concedida pelo Reitor e publicada no DOU antes da data da viagem e da compra das passagens.",
           "campos": [
-            {"nome": "chefe_departamento", "label": "Nome do Chefe de Departamento (proponente)", "tipo": "text", "obrigatorio": true},
-            {"nome": "enviado_dacq", "label": "Enviei o processo ao DACQ/PROGEPE para autorização", "tipo": "checkbox", "obrigatorio": true},
-            {"nome": "ciente_dou", "label": "Estou ciente da publicação no Diário Oficial da União", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "chefe_departamento",
+              "label": "Nome do Chefe de Departamento (proponente)",
+              "tipo": "text",
+              "obrigatorio": true
+            },
+            {
+              "nome": "enviado_dacq",
+              "label": "Enviei o processo ao DACQ/PROGEPE para autorização",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            },
+            {
+              "nome": "ciente_dou",
+              "label": "Estou ciente da publicação no Diário Oficial da União",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         },
         {
@@ -213,10 +683,27 @@
           "titulo": "Passo 5 - Retorno e cadastro",
           "descricao": "Publicado no DOU, o processo retorna à unidade para o cadastro final da PCDP no SCDP.",
           "campos": [
-            {"nome": "ciente_retorno", "label": "Estou ciente de que o processo retorna à unidade para cadastro da PCDP", "tipo": "checkbox", "obrigatorio": true}
+            {
+              "nome": "ciente_retorno",
+              "label": "Estou ciente de que o processo retorna à unidade para cadastro da PCDP",
+              "tipo": "checkbox",
+              "obrigatorio": true
+            }
           ]
         }
-      ]
+      ],
+      "prazo_dias": 60
     }
+  },
+  "enquadramento": {
+    "atividades_desenvolvimento": [
+      "treinamento",
+      "congresso",
+      "capacitacao"
+    ],
+    "dias_limite_sem_sei": 15,
+    "categorias_sempre_abrem_sei": [
+      "tecnico"
+    ]
   }
 }

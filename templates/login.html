@@ -15,6 +15,7 @@
   {% if dev_login %}
   <div class="separador"><span>ou entre para testar</span></div>
   <form method="post" action="{{ url_for('dev_login') }}" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>Nome
       <input type="text" name="nome" placeholder="Seu nome">
     </label>

@@ -6,6 +6,7 @@
   <h1>Descubra a sua situação</h1>
   <p class="subtitulo">Responda quatro perguntas e o sistema indica o fluxo correto conforme a IN 058/2023.</p>
   <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>A viagem é
       <select name="abrangencia" required>
         <option value="nacional">No Brasil</option>

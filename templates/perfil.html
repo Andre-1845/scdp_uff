@@ -5,6 +5,7 @@
   <h1>Meus dados</h1>
   <p class="subtitulo">Estes dados ficam salvos e são reaproveitados nas próximas solicitações.</p>
   <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>Nome completo
       <input type="text" name="nome" value="{{ doc.nome or '' }}" required>
     </label>

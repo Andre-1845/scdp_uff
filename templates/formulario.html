@@ -22,6 +22,7 @@
   {% endif %}
 
   <form method="post" class="form" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% for campo in formulario.campos %}
       <label class="{% if campo.tipo == 'checkbox' %}campo-check{% endif %}">
         {% if campo.tipo == 'select' %}

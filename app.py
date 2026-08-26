@@ -6,6 +6,7 @@ from datetime import datetime, date
 from flask import (Flask, render_template, redirect, url_for, session,
                    request, flash, abort, send_file)
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 
@@ -25,6 +26,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024  # 15 MB por requisição
 
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 ALLOWED_DOMAIN = os.getenv("ALLOWED_DOMAIN", "id.uff.br")
 DEV_LOGIN = os.getenv("DEV_LOGIN", "1") == "1"
@@ -32,6 +34,10 @@ STAFF_EMAILS = {
     e.strip().lower() for e in os.getenv("STAFF_EMAILS", "").split(",") if e.strip()
 }
 STATUS_VALIDOS = ["Pendente", "Lançado no SCDP", "Concluído"]
+PRAZO_PADRAO_DIAS = 15
+# campos do perfil que o Anexo II precisa (vêm do SIAPE, conforme a norma);
+# sem eles o documento oficial sai incompleto
+PERFIL_CAMPOS_OBRIGATORIOS = [("siape", "SIAPE"), ("departamento", "Departamento"), ("cargo", "Cargo")]
 
 # ---- carrega a "receita" dos formulários ----
 def carregar_config():
@@ -77,6 +83,37 @@ def _pasta_rascunho(docente_id, situacao):
 def _pasta_solicitacao(sid):
     return os.path.join(UPLOAD_DIR, f"solicitacao_{sid}")
 
+
+# ---- rascunho do formulário, persistido no banco (item 6) ----
+def _carregar_rascunho(docente_id, situacao):
+    r = Rascunho.query.filter_by(docente_id=docente_id, situacao=situacao).first()
+    return r.respostas if r else {}
+
+
+def _salvar_rascunho(docente_id, situacao, dados):
+    r = Rascunho.query.filter_by(docente_id=docente_id, situacao=situacao).first()
+    if not r:
+        r = Rascunho(docente_id=docente_id, situacao=situacao)
+        db.session.add(r)
+    r.respostas_json = json.dumps(dados, ensure_ascii=False)
+    db.session.commit()
+
+
+def _excluir_rascunho(docente_id, situacao):
+    r = Rascunho.query.filter_by(docente_id=docente_id, situacao=situacao).first()
+    if r:
+        db.session.delete(r)
+        db.session.commit()
+    pasta = _pasta_rascunho(docente_id, situacao)
+    if os.path.isdir(pasta):
+        shutil.rmtree(pasta)
+
+
+# ---- perfil completo o bastante para gerar documento oficial (item 7) ----
+def _perfil_incompleto(doc):
+    """Devolve a lista de rótulos dos campos do perfil que ainda faltam."""
+    return [rotulo for campo, rotulo in PERFIL_CAMPOS_OBRIGATORIOS if not (getattr(doc, campo) or "").strip()]
+
 # ---- OAuth Google (só ativa se houver credenciais) ----
 oauth = None
 google = None
@@ -116,6 +153,23 @@ class Solicitacao(db.Model):
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
 
     docente = db.relationship("Docente", backref="solicitacoes")
+
+    @property
+    def respostas(self):
+        return json.loads(self.respostas_json)
+
+
+class Rascunho(db.Model):
+    """Guarda o formulário em andamento no banco, não só na sessão do
+    navegador — se o professor fechar o navegador no meio do preenchimento,
+    o rascunho continua ali para ele retomar depois."""
+    id = db.Column(db.Integer, primary_key=True)
+    docente_id = db.Column(db.Integer, db.ForeignKey("docente.id"), nullable=False)
+    situacao = db.Column(db.String(50), nullable=False)
+    respostas_json = db.Column(db.Text, nullable=False, default="{}")
+    atualizado_em = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (db.UniqueConstraint("docente_id", "situacao", name="uq_rascunho_docente_situacao"),)
 
     @property
     def respostas(self):
@@ -185,7 +239,7 @@ def auth_callback():
         flash("Acesso permitido apenas para contas @" + ALLOWED_DOMAIN + ".", "erro")
         return redirect(url_for("login"))
     _entrar(email, info.get("name"))
-    return redirect(url_for("perfil"))
+    return _destino_pos_login(email)
 
 
 @app.route("/dev-login", methods=["POST"])
@@ -197,7 +251,7 @@ def dev_login():
         flash("Use um e-mail @" + ALLOWED_DOMAIN + " para o teste.", "erro")
         return redirect(url_for("login"))
     _entrar(email, request.form.get("nome") or email.split("@")[0])
-    return redirect(url_for("perfil"))
+    return _destino_pos_login(email)
 
 
 def _entrar(email, nome):
@@ -213,6 +267,16 @@ def _entrar(email, nome):
         doc.is_staff = deve_ser_staff
     db.session.commit()
     session["email"] = email
+
+
+def _destino_pos_login(email):
+    """Só força a tela 'Meus dados' se faltar algo que o Anexo II precisa.
+    Quem já tem o perfil completo vai direto para a tela de solicitação."""
+    doc = Docente.query.filter_by(email=email).first()
+    if _perfil_incompleto(doc):
+        flash("Complete seus dados antes de começar uma solicitação.", "ok")
+        return redirect(url_for("perfil"))
+    return redirect(url_for("escolher"))
 
 
 @app.route("/logout")
@@ -246,9 +310,15 @@ def escolher():
     r = exige_login()
     if r:
         return r
+    doc = docente_logado()
     cfg = carregar_config()["situacoes"]
     situacoes = sorted(cfg.items(), key=lambda kv: kv[1].get("ordem", 99))
-    return render_template("escolher.html", situacoes=situacoes)
+    rascunhos = Rascunho.query.filter_by(docente_id=doc.id).all()
+    rascunhos_pendentes = [
+        {"situacao": r.situacao, "titulo": cfg[r.situacao]["titulo"], "atualizado_em": r.atualizado_em}
+        for r in rascunhos if r.situacao in cfg
+    ]
+    return render_template("escolher.html", situacoes=situacoes, rascunhos_pendentes=rascunhos_pendentes)
 
 
 # ---------------- assistente de enquadramento (Anexo VII) ----------------
@@ -271,28 +341,38 @@ def enquadrar():
 
 
 def _enquadrar(abrangencia, atividade, periodo, categoria):
-    # lógica derivada da tabela do Anexo VII da IN 058/2023
+    # lógica derivada da tabela do Anexo VII da IN 058/2023. Os limites e
+    # listas usadas aqui (quais atividades contam como "desenvolvimento",
+    # o limite de dias, quais categorias sempre abrem SEI) ficam no
+    # forms_config.json, em "enquadramento" — se a norma mudar um número
+    # ou uma lista, dá para editar o JSON sem mexer neste código.
+    regras = carregar_config().get("enquadramento", {})
+    atividades_dev = regras.get("atividades_desenvolvimento", ["treinamento", "congresso", "capacitacao"])
+    dias_limite = regras.get("dias_limite_sem_sei", 15)
+    categorias_sei = regras.get("categorias_sempre_abrem_sei", ["tecnico"])
+
     if abrangencia == "exterior":
         return ("internacional",
                 "Viagem ao exterior. Abre processo no SEI, exige seguro viagem e passa pela DACQ da PROGEPE, com publicação no DOU.",
                 True)
     # nacional
-    desenvolvimento = atividade in ("treinamento", "congresso", "capacitacao")
+    desenvolvimento = atividade in atividades_dev
     if desenvolvimento:
         if periodo == "mais15":
             return ("nacional_longo",
-                    "Ação de desenvolvimento acima de 15 dias. Abre processo no SEI e vai à DACQ da PROGEPE.",
+                    f"Ação de desenvolvimento acima de {dias_limite} dias. Abre processo no SEI e vai à DACQ da PROGEPE.",
                     True)
-        if categoria == "tecnico":
+        if categoria in categorias_sei:
             return ("nacional_longo",
-                    "Técnico-administrativo em ação de desenvolvimento abre processo no SEI mesmo até 15 dias, conforme a Instrução de Serviço PROGEPE 001/2020.",
+                    "Técnico-administrativo em ação de desenvolvimento abre processo no SEI mesmo até "
+                    f"{dias_limite} dias, conforme a Instrução de Serviço PROGEPE 001/2020.",
                     True)
         return ("nacional_curto",
-                "Docente em ação de desenvolvimento de 1 a 15 dias não abre processo no SEI, apenas o Anexo II para cadastro da PCDP.",
+                f"Docente em ação de desenvolvimento de 1 a {dias_limite} dias não abre processo no SEI, apenas o Anexo II para cadastro da PCDP.",
                 False)
     # viagem a serviço, banca de concurso ou trabalho de campo, nacional
     return ("nacional_curto",
-            "Viagem a serviço, banca de concurso ou trabalho de campo no país não abre processo no SEI, apenas o Anexo II para cadastro da PCDP pela unidade. Se durar mais de 15 dias, o fluxo é o mesmo, mas confirme o prazo com a Secretaria.",
+            f"Viagem a serviço, banca de concurso ou trabalho de campo no país não abre processo no SEI, apenas o Anexo II para cadastro da PCDP pela unidade. Se durar mais de {dias_limite} dias, o fluxo é o mesmo, mas confirme o prazo com a Secretaria.",
             False)
 
 
@@ -312,12 +392,13 @@ def solicitar(situacao, passo):
         abort(404)
     formulario = forms[passo - 1]
 
-    # respostas parciais ficam na sessão, por situação
-    chave = "rascunho_" + situacao
-    rascunho = session.get(chave, {})
+    # respostas parciais ficam no banco (Rascunho), não só na sessão do
+    # navegador — assim sobrevivem a fechar o navegador no meio do caminho
+    rascunho = _carregar_rascunho(doc.id, situacao)
 
     if request.method == "POST":
-        erros = _validar(formulario, request.form, situacao)
+        prazo_dias = cfg[situacao].get("prazo_dias", PRAZO_PADRAO_DIAS)
+        erros = _validar(formulario, request.form, situacao, prazo_dias)
 
         # valida extensão dos arquivos antes de gravar qualquer coisa em disco
         for c in formulario["campos"]:
@@ -361,7 +442,7 @@ def solicitar(situacao, passo):
                 # em rascunho.get(c["nome"]) sem sobrescrever com vazio
             else:
                 rascunho[c["nome"]] = request.form.get(c["nome"], "")
-        session[chave] = rascunho
+        _salvar_rascunho(doc.id, situacao, rascunho)
         if passo < total:
             return redirect(url_for("solicitar", situacao=situacao, passo=passo + 1))
         return redirect(url_for("revisao", situacao=situacao))
@@ -372,7 +453,7 @@ def solicitar(situacao, passo):
                            formulario=formulario, passo=passo, total=total, valores=valores)
 
 
-def _validar(formulario, form, situacao=None):
+def _validar(formulario, form, situacao=None, prazo_dias=PRAZO_PADRAO_DIAS):
     erros = []
     for c in formulario["campos"]:
         val = form.get(c["nome"])
@@ -381,15 +462,17 @@ def _validar(formulario, form, situacao=None):
                 erros.append("Marque o campo obrigatório: " + c["label"])
             elif c["tipo"] != "checkbox" and not (val or "").strip():
                 erros.append("Preencha o campo obrigatório: " + c["label"])
-    # regra de ouro dos 15 dias de antecedência
+    # regra de ouro da antecedência mínima — o prazo varia por situação
+    # (15 dias para nacional curto, 60 para nacional longo e internacional,
+    # conforme forms_config.json), então não dá pra usar um número fixo aqui
     di = form.get("data_inicio")
     df = form.get("data_fim")
     d_ini = None
     if di:
         try:
             d_ini = datetime.strptime(di, "%Y-%m-%d").date()
-            if (d_ini - date.today()).days < 15:
-                erros.append("Atenção, a data de início está a menos de 15 dias. A norma pede no mínimo 15 dias de antecedência.")
+            if (d_ini - date.today()).days < prazo_dias:
+                erros.append(f"Atenção, a data de início está a menos de {prazo_dias} dias. A norma pede no mínimo {prazo_dias} dias de antecedência para esta situação.")
         except ValueError:
             pass
     # regra da duração conforme a situação (guia IN 058/2023)
@@ -408,16 +491,33 @@ def _validar(formulario, form, situacao=None):
     return erros
 
 
+@app.route("/rascunho/<situacao>/descartar", methods=["POST"])
+def descartar_rascunho(situacao):
+    r = exige_login()
+    if r:
+        return r
+    doc = docente_logado()
+    _excluir_rascunho(doc.id, situacao)
+    flash("Rascunho descartado.", "ok")
+    return redirect(url_for("escolher"))
+
+
 # ---------------- revisão e gravação ----------------
 @app.route("/revisao/<situacao>")
 def revisao(situacao):
     r = exige_login()
     if r:
         return r
+    doc = docente_logado()
     cfg = carregar_config()["situacoes"]
     if situacao not in cfg:
         abort(404)
-    rascunho = session.get("rascunho_" + situacao, {})
+    faltando = _perfil_incompleto(doc)
+    if faltando:
+        flash("Antes de enviar, complete no seu perfil: " + ", ".join(faltando) +
+             ". Esses dados são obrigatórios no Anexo II.", "erro")
+        return redirect(url_for("perfil"))
+    rascunho = _carregar_rascunho(doc.id, situacao)
     return render_template("revisao.html", situacao=situacao,
                            titulo_situacao=cfg[situacao]["titulo"],
                            forms=cfg[situacao]["formularios"], respostas=rascunho)
@@ -432,7 +532,12 @@ def salvar(situacao):
     if situacao not in cfg:
         abort(404)
     doc = docente_logado()
-    rascunho = session.get("rascunho_" + situacao, {})
+    faltando = _perfil_incompleto(doc)
+    if faltando:
+        flash("Antes de enviar, complete no seu perfil: " + ", ".join(faltando) +
+             ". Esses dados são obrigatórios no Anexo II.", "erro")
+        return redirect(url_for("perfil"))
+    rascunho = _carregar_rascunho(doc.id, situacao)
     s = Solicitacao(docente_id=doc.id, situacao=situacao,
                     respostas_json=json.dumps(rascunho, ensure_ascii=False))
     db.session.add(s)
@@ -449,7 +554,10 @@ def salvar(situacao):
     elif os.path.isdir(pasta_rascunho):
         shutil.rmtree(pasta_rascunho)
 
-    session.pop("rascunho_" + situacao, None)
+    r_rascunho = Rascunho.query.filter_by(docente_id=doc.id, situacao=situacao).first()
+    if r_rascunho:
+        db.session.delete(r_rascunho)
+        db.session.commit()
     flash("Solicitação registrada. Agora baixe os documentos preenchidos.", "ok")
     return redirect(url_for("documentos", sid=s.id))
 
@@ -518,6 +626,28 @@ def baixar_documento(sid, tipo):
 def _perfil_dict(doc):
     return {"nome": doc.nome, "siape": doc.siape, "departamento": doc.departamento,
             "cargo": doc.cargo, "telefone": doc.telefone, "email": doc.email}
+
+
+@app.route("/solicitacao/<int:sid>/excluir", methods=["POST"])
+def excluir_solicitacao(sid):
+    r = exige_login()
+    if r:
+        return r
+    doc = docente_logado()
+    s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
+    # só deixa excluir enquanto ainda está pendente — depois que a Secretaria
+    # começa a tratar (mudou o status), cancelar por conta própria pode
+    # deixar a Secretaria sem saber que sumiu
+    if s.status != "Pendente":
+        flash("Esta solicitação já está sendo tratada pela Secretaria e não pode mais ser excluída por aqui. Fale direto com a Secretaria.", "erro")
+        return redirect(url_for("minhas_solicitacoes"))
+    pasta = _pasta_solicitacao(sid)
+    if os.path.isdir(pasta):
+        shutil.rmtree(pasta)
+    db.session.delete(s)
+    db.session.commit()
+    flash("Solicitação excluída.", "ok")
+    return redirect(url_for("minhas_solicitacoes"))
 
 
 @app.route("/minhas-solicitacoes")
@@ -592,4 +722,8 @@ with app.app_context():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # debug=True vaza stack trace e habilita o debugger interativo do
+    # Werkzeug (risco de execução remota de código se alguém achar o PIN) —
+    # nunca deixe ligado em um ambiente exposto. Controlado pelo .env.
+    modo_debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(debug=modo_debug, port=5000)

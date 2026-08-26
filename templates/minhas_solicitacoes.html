@@ -11,7 +11,7 @@
 {% else %}
   <table class="tabela">
     <thead>
-      <tr><th>Data</th><th>Situação</th><th>Destino</th><th>Início</th><th>Documentos</th></tr>
+      <tr><th>Data</th><th>Situação</th><th>Destino</th><th>Início</th><th>Status</th><th>Documentos</th><th></th></tr>
     </thead>
     <tbody>
       {% for s in itens %}
@@ -20,7 +20,17 @@
         <td>{{ cfg[s.situacao].titulo if s.situacao in cfg else s.situacao }}</td>
         <td>{{ s.respostas.get('destino') or s.respostas.get('cidade_destino') or '—' }}</td>
         <td>{{ s.respostas.get('data_inicio')|data_br or '—' }}</td>
+        <td><span class="select-status status-{{ s.status|lower|replace(' ', '-') }}">{{ s.status }}</span></td>
         <td><a class="link" href="{{ url_for('documentos', sid=s.id) }}">Baixar</a></td>
+        <td>
+          {% if s.status == 'Pendente' %}
+          <form method="post" action="{{ url_for('excluir_solicitacao', sid=s.id) }}"
+                onsubmit="return confirm('Excluir esta solicitação? Não dá para desfazer.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="link link-descartar">excluir</button>
+          </form>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
