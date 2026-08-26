@@ -38,10 +38,20 @@ A geração usa a biblioteca python-docx, já incluída no requirements.txt.
 ## Como rodar (sem usar terminal, para quem não programa)
 
 Para uma pessoa que nunca usou Python, existe um guia ilustrado passo a
-passo: `GUIA_INSTALACAO_SCDP.docx`. Ele explica como instalar o Python e
-como criar um atalho na Área de Trabalho (`iniciar_sistema.bat` +
-`criar_atalho.ps1`) que abre o sistema com um duplo clique, sem precisar
-de terminal, VSCode ou qualquer ferramenta de programação.
+passo: `GUIA_INSTALACAO_SCDP.docx`. Ele cobre duas formas de deixar o
+sistema pronto para abrir com um clique:
+
+- **`build_exe.bat`** (recomendado): gera um único arquivo `scdp-uff.exe`
+  que empacota o Python e todas as dependências juntos. Esse `.exe` pode
+  ser copiado para qualquer computador Windows e aberto com duplo clique,
+  **sem precisar instalar Python** nele — é o mais próximo de um
+  instalador de verdade que dá para ter sem assinatura digital paga. Só
+  precisa ser gerado uma vez, num computador que já tenha o Python (por
+  exemplo, depois de seguir o Passo 1 do guia).
+- **`iniciar_sistema.bat` + `criar_atalho.ps1`**: cria um atalho na Área
+  de Trabalho que roda o `app.py` normalmente, usando o Python instalado
+  naquele computador. Mais simples de configurar, mas precisa de Python
+  em cada computador onde for usado.
 
 ## Como rodar (linha de comando, para quem já programa)
 
@@ -231,5 +241,8 @@ A plataforma lida com dados de servidores, então precisa de conformidade com a 
 - GUIA_INSTALACAO_SCDP.docx, o guia passo a passo para quem nunca usou Python
 - iniciar_sistema.bat / criar_atalho.ps1, o atalho de abrir o sistema com
   duplo clique (veja o guia acima)
+- build_exe.bat, gera o scdp-uff.exe (executável único, sem precisar de
+  Python no computador de destino) — usa o PyInstaller, instalado por
+  esse mesmo script
 - uploads/, os arquivos anexados pelos professores (criada sozinha no
   primeiro uso; não é versionada no git)

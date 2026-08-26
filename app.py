@@ -1,6 +1,10 @@
 import os
+import sys
 import json
 import shutil
+import secrets
+import threading
+import webbrowser
 from datetime import datetime, date
 
 from flask import (Flask, render_template, redirect, url_for, session,
@@ -12,14 +16,47 @@ from werkzeug.utils import secure_filename
 
 import docs_gen
 
-load_dotenv()
+# ---- caminhos: preparados tanto para "python app.py" quanto para o
+# executável gerado pelo PyInstaller (scdp-uff.exe) ----
+# Empacotado (frozen): os dados que precisam ser graváveis (.env, o banco
+# dados.db, os anexos em uploads/) ficam ao lado do .exe. Os arquivos
+#"só leitura" do próprio sistema (templates, style.css, forms_config.json)
+# ficam empacotados dentro do executável, numa pasta temporária que o
+# PyInstaller cria sozinho (sys._MEIPASS).
+CONGELADO = getattr(sys, "frozen", False)
+if CONGELADO:
+    BASE_DIR = os.path.dirname(sys.executable)
+    RECURSOS_DIR = getattr(sys, "_MEIPASS", BASE_DIR)
+else:
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    RECURSOS_DIR = BASE_DIR
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+if CONGELADO and not os.path.isfile(ENV_PATH):
+    # primeira vez rodando o .exe num computador novo: cria um .env padrão
+    # sozinho, para a pessoa não precisar copiar/editar nada na mão
+    with open(ENV_PATH, "w", encoding="utf-8") as f:
+        f.write(
+            "SECRET_KEY=" + secrets.token_hex(32) + "\n"
+            "ALLOWED_DOMAIN=id.uff.br\n"
+            "DEV_LOGIN=1\n"
+            "FLASK_DEBUG=0\n"
+            "STAFF_EMAILS=\n"
+            "GOOGLE_CLIENT_ID=\n"
+            "GOOGLE_CLIENT_SECRET=\n"
+        )
+
+load_dotenv(ENV_PATH)
+
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 EXTENSOES_PERMITIDAS = {"pdf", "jpg", "jpeg", "png", "doc", "docx"}
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(RECURSOS_DIR, "templates"),
+    static_folder=os.path.join(RECURSOS_DIR, "static"),
+)
 app.secret_key = os.getenv("SECRET_KEY", "troque-esta-chave-em-producao")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "dados.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -41,7 +78,7 @@ PERFIL_CAMPOS_OBRIGATORIOS = [("siape", "SIAPE"), ("departamento", "Departamento
 
 # ---- carrega a "receita" dos formulários ----
 def carregar_config():
-    with open(os.path.join(BASE_DIR, "forms_config.json"), encoding="utf-8") as f:
+    with open(os.path.join(RECURSOS_DIR, "forms_config.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -721,9 +758,22 @@ with app.app_context():
     db.create_all()
 
 
+def _abrir_navegador():
+    import time
+    time.sleep(1.5)
+    webbrowser.open("http://localhost:5000")
+
+
 if __name__ == "__main__":
     # debug=True vaza stack trace e habilita o debugger interativo do
     # Werkzeug (risco de execução remota de código se alguém achar o PIN) —
     # nunca deixe ligado em um ambiente exposto. Controlado pelo .env.
     modo_debug = os.getenv("FLASK_DEBUG", "0") == "1"
-    app.run(debug=modo_debug, port=5000)
+    # no .exe (ou no atalho), ninguém vai digitar o endereço na mão —
+    # o navegador abre sozinho pouco depois do servidor subir
+    if CONGELADO or os.getenv("ABRIR_NAVEGADOR", "1") == "1":
+        threading.Thread(target=_abrir_navegador, daemon=True).start()
+    # use_reloader=False é obrigatório no .exe: o recarregador automático
+    # do Flask tenta reiniciar o processo executando o próprio Python, o
+    # que não existe dentro do executável empacotado
+    app.run(debug=modo_debug, port=5000, use_reloader=False)

@@ -10,3 +10,11 @@ dados.db
 uploads/
 
 .DS_Store
+
+# artefatos do build do executavel (build_exe.bat) - nao versionar,
+# cada um gera o seu localmente. O scdp-uff.exe final tambem fica de
+# fora, por ser um binario grande (~25 MB) que muda a cada build
+build/
+dist/
+*.spec
+scdp-uff.exe
