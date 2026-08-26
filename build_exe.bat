@@ -6,7 +6,7 @@ where python >nul 2>nul
 if errorlevel 1 (
   echo.
   echo O Python nao foi encontrado neste computador. Instale o Python
-  echo primeiro (veja o Guia de instalacao, Passo 1) e rode este arquivo
+  echo primeiro ^(veja o Guia de instalacao, Passo 1^) e rode este arquivo
   echo de novo.
   echo.
   pause
