@@ -17,6 +17,9 @@
       <nav class="nav">
         <a href="{{ url_for('escolher') }}">Nova solicitação</a>
         <a href="{{ url_for('minhas_solicitacoes') }}">Minhas solicitações</a>
+        {% if usuario.is_staff %}
+        <a href="{{ url_for('secretaria') }}">Painel da Secretaria</a>
+        {% endif %}
         <a href="{{ url_for('perfil') }}">Meus dados</a>
         <span class="nav-usuario">{{ usuario.email }}</span>
         <a class="sair" href="{{ url_for('logout') }}">Sair</a>

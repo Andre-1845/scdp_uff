@@ -94,6 +94,49 @@ Para produção, defina DEV_LOGIN como 0 no .env para desativar o acesso de test
 - **Data em formato errado** na tela "Minhas solicitações" (aparecia
   `2026-09-15` em vez de `15/09/2026`). Corrigido.
 
+## Painel da Secretaria (novo)
+
+**Atenção, antes de rodar esta versão:** se você já tinha usado uma versão
+anterior deste sistema, apague o arquivo `dados.db` antes de rodar de novo.
+Esta atualização acrescentou colunas novas nas tabelas do banco
+(`is_staff` no professor, `status` na solicitação), e o SQLite não adiciona
+colunas sozinho em um banco que já existe — ele só cria tabelas novas do
+zero. Como ainda é fase de protótipo/teste, a forma mais simples é apagar
+`dados.db` e deixar o sistema recriar o banco na próxima vez que rodar
+(`python app.py`). Isso apaga as solicitações de teste que você já tinha
+criado, mas não afeta nada de produção, já que isso ainda não está em uso
+real.
+
+Agora existe uma visão que reúne as solicitações de **todos** os professores,
+não só as de quem está logado — é o que faltava para a Secretaria conseguir
+usar o sistema de fato para organizar o que precisa ser lançado no SCDP.
+
+### Como dar acesso a alguém
+
+Não tem tela de cadastro de usuário/permissão. É mais simples: no arquivo
+`.env`, defina os e-mails da Secretaria na variável `STAFF_EMAILS`, separados
+por vírgula:
+
+```
+STAFF_EMAILS=secretaria@id.uff.br,outra.pessoa@id.uff.br
+```
+
+Quem logar com um desses e-mails (pelo Google ou pelo acesso de teste)
+ganha acesso automático ao Painel da Secretaria — não precisa reiniciar o
+banco nem fazer nada manual. Se tirar um e-mail dessa lista, a pessoa perde
+o acesso no próximo login dela.
+
+### O que o painel mostra
+
+- Todas as solicitações, com nome, e-mail e departamento do professor.
+- Filtro por situação (curta/longa/internacional), por status e por busca
+  livre (nome, e-mail ou destino).
+- Um status por solicitação — **Pendente**, **Lançado no SCDP** ou
+  **Concluído** — que a Secretaria muda direto na lista, sem precisar abrir
+  cada uma.
+- Acesso aos documentos Word e aos anexos de qualquer solicitação (a
+  Secretaria não fica restrita a ver só o que ela mesma preencheu).
+
 ## Cuidados para virar oficial
 
 A plataforma lida com dados de servidores, então precisa de conformidade com a LGPD e do aval da área de tecnologia da UFF, a STI, antes de entrar em produção. Este protótipo serve para validar a ideia e demonstrar o conceito.

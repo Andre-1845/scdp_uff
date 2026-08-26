@@ -28,6 +28,10 @@ db = SQLAlchemy(app)
 
 ALLOWED_DOMAIN = os.getenv("ALLOWED_DOMAIN", "id.uff.br")
 DEV_LOGIN = os.getenv("DEV_LOGIN", "1") == "1"
+STAFF_EMAILS = {
+    e.strip().lower() for e in os.getenv("STAFF_EMAILS", "").split(",") if e.strip()
+}
+STATUS_VALIDOS = ["Pendente", "Lançado no SCDP", "Concluído"]
 
 # ---- carrega a "receita" dos formulários ----
 def carregar_config():
@@ -99,6 +103,7 @@ class Docente(db.Model):
     departamento = db.Column(db.String(120))
     cargo = db.Column(db.String(120))
     telefone = db.Column(db.String(40))
+    is_staff = db.Column(db.Boolean, default=False, nullable=False)
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -107,6 +112,7 @@ class Solicitacao(db.Model):
     docente_id = db.Column(db.Integer, db.ForeignKey("docente.id"), nullable=False)
     situacao = db.Column(db.String(50), nullable=False)
     respostas_json = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(30), default="Pendente", nullable=False)
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
 
     docente = db.relationship("Docente", backref="solicitacoes")
@@ -132,6 +138,16 @@ def injetar_usuario():
 def exige_login():
     if not session.get("email"):
         return redirect(url_for("login"))
+    return None
+
+
+def exige_staff():
+    r = exige_login()
+    if r:
+        return r
+    doc = docente_logado()
+    if not doc or not doc.is_staff:
+        abort(403)
     return None
 
 
@@ -189,7 +205,13 @@ def _entrar(email, nome):
     if not doc:
         doc = Docente(email=email, nome=nome)
         db.session.add(doc)
-        db.session.commit()
+    # a lista de e-mails da Secretaria fica no .env (STAFF_EMAILS); ao logar,
+    # o sistema confere e ajusta o acesso automaticamente, sem precisar de
+    # tela de administração
+    deve_ser_staff = email.lower() in STAFF_EMAILS
+    if doc.is_staff != deve_ser_staff:
+        doc.is_staff = deve_ser_staff
+    db.session.commit()
     session["email"] = email
 
 
@@ -438,8 +460,11 @@ def documentos(sid):
     if r:
         return r
     doc = docente_logado()
-    s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
-    lista = docs_gen.documentos_da_situacao(s.situacao, _perfil_dict(doc), s.respostas)
+    if doc.is_staff:
+        s = Solicitacao.query.filter_by(id=sid).first_or_404()
+    else:
+        s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
+    lista = docs_gen.documentos_da_situacao(s.situacao, _perfil_dict(s.docente), s.respostas)
     cfg = carregar_config()["situacoes"]
 
     # anexos de fato enviados pelo professor (convites, apólice, comprovantes...)
@@ -459,7 +484,10 @@ def baixar_anexo(sid, nome_campo):
     if r:
         return r
     doc = docente_logado()
-    s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
+    if doc.is_staff:
+        s = Solicitacao.query.filter_by(id=sid).first_or_404()
+    else:
+        s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
     nome_salvo = s.respostas.get(nome_campo)
     if not nome_salvo:
         abort(404)
@@ -476,8 +504,11 @@ def baixar_documento(sid, tipo):
     if r:
         return r
     doc = docente_logado()
-    s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
-    buf, nome = docs_gen.gerar(tipo, _perfil_dict(doc), s.respostas)
+    if doc.is_staff:
+        s = Solicitacao.query.filter_by(id=sid).first_or_404()
+    else:
+        s = Solicitacao.query.filter_by(id=sid, docente_id=doc.id).first_or_404()
+    buf, nome = docs_gen.gerar(tipo, _perfil_dict(s.docente), s.respostas)
     if not buf:
         abort(404)
     return send_file(buf, as_attachment=True, download_name=nome,
@@ -499,6 +530,61 @@ def minhas_solicitacoes():
              .order_by(Solicitacao.criado_em.desc()).all())
     cfg = carregar_config()["situacoes"]
     return render_template("minhas_solicitacoes.html", itens=itens, cfg=cfg)
+
+
+# ---------------- painel da secretaria ----------------
+@app.route("/secretaria")
+def secretaria():
+    r = exige_staff()
+    if r:
+        return r
+    cfg = carregar_config()["situacoes"]
+
+    situacao_f = request.args.get("situacao", "")
+    status_f = request.args.get("status", "")
+    busca = (request.args.get("busca") or "").strip().lower()
+
+    query = Solicitacao.query.join(Docente)
+    if situacao_f:
+        query = query.filter(Solicitacao.situacao == situacao_f)
+    if status_f:
+        query = query.filter(Solicitacao.status == status_f)
+    itens = query.order_by(Solicitacao.criado_em.desc()).all()
+
+    if busca:
+        def bate(s):
+            alvo = " ".join([
+                s.docente.nome or "", s.docente.email or "",
+                s.respostas.get("destino") or "", s.respostas.get("cidade_destino") or "",
+            ]).lower()
+            return busca in alvo
+        itens = [s for s in itens if bate(s)]
+
+    return render_template("secretaria.html", itens=itens, cfg=cfg,
+                           situacoes=cfg.items(), status_validos=STATUS_VALIDOS,
+                           situacao_f=situacao_f, status_f=status_f, busca=busca)
+
+
+@app.route("/secretaria/solicitacao/<int:sid>/status", methods=["POST"])
+def atualizar_status(sid):
+    r = exige_staff()
+    if r:
+        return r
+    s = Solicitacao.query.get_or_404(sid)
+    novo = request.form.get("status")
+    if novo not in STATUS_VALIDOS:
+        abort(400)
+    s.status = novo
+    db.session.commit()
+    flash("Status atualizado.", "ok")
+    # mantém os filtros que estavam ativos na tela (vieram como campos ocultos)
+    filtros = {
+        "situacao": request.form.get("situacao_f", ""),
+        "status": request.form.get("status_f", ""),
+        "busca": request.form.get("busca_f", ""),
+    }
+    filtros = {k: v for k, v in filtros.items() if v}
+    return redirect(url_for("secretaria", **filtros))
 
 
 with app.app_context():
